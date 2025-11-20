@@ -1,17 +1,20 @@
-const http = require('http');
 const crypto = require('crypto');
 
-const server = http.createServer((req, res) => {
-    // 1. Generate a random code
+// On Vercel, we export a function instead of starting a server
+module.exports = (req, res) => {
+    // 1. Generate the random code
     const code = crypto.randomBytes(4).toString('hex').toUpperCase();
+    const formatted = `${code.slice(0,4)}-${code.slice(4,8)}`;
 
-    // 2. Send the response to the browser
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(`<h1>Your Random Code: ${code}</h1>`);
-});
-
-// This is crucial: Vercel assigns a specific port, we must use it.
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+    // 2. Send the response
+    // 200 means "OK"
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html');
+    res.end(`
+        <div style="font-family: sans-serif; text-align: center; margin-top: 50px;">
+            <h1>Your Random Code</h1>
+            <h2 style="font-size: 3em; color: #0070f3;">${formatted}</h2>
+            <p>Refresh for a new code</p>
+        </div>
+    `);
+};
